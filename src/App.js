@@ -92,7 +92,7 @@ function App() {
 
       <br/>
       <form onSubmit={getAllVehicles} className="d-flex justify-content-center mb-3">
-        <button className='btn btn-danger' type='submit'>Get Contract Details</button>
+        <button className='btn btn-danger ' type='submit'>Get Record Details</button>
       </form>
 
       <table className='table table-striped w-50 mx-auto bg-body-tertiary rounded text-center'>
