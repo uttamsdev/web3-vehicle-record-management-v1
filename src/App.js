@@ -1,26 +1,40 @@
 //contract address: 0x311EAc20935625482fB4ECF406C0046b65Aa9584 0x364273743a19eb68EBB9d901c0707994b50E5b96
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ethers } from "ethers";
 import abi from "./abi.json";
 import './App.css';
+import swal from 'sweetalert';
 const { ethereum } = window;
 
 
 function App() {
   const [isLoading, setIsLoading] = useState(false);
-
   const [currentAccount, setCurrentAccount] = useState("");
-
   const [vehicles, setVehicles] = useState([]);
-  const [metaMaskConnected, setMetaMaskConnected] = useState(false);
 
+
+  const checkIfWalletIsConnected = async() => {
+        try {
+            if(!ethereum)  return alert("Please install MetaMak.");
+            const accounts = await ethereum.request({method: 'eth_accounts'});
+
+            if(accounts.length){ //if accounted connected
+            setCurrentAccount(accounts[0]);
+        } else {
+            console.log("No account found");
+        }
+        console.log(accounts);
+        } catch (error) {
+            console.log(error);
+            throw new Error("No ethereum object.");
+        }
+    }
 
   const connectWallet = async () => {
     try {
       if (!ethereum) return alert("Please install Metamask!!!");
       const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
       setCurrentAccount(accounts[0]);
-      setMetaMaskConnected(true);
     } catch (err) {
       throw new Error("No ethereum object found");
     }
@@ -39,14 +53,13 @@ function App() {
         console.log(_name, _number, _address, _model, _soldDate);
     
         const vehicleContract = new ethers.Contract("0xAAE09c65722c0DE64Ec6cF33c2399102477Ca387", abi, signer);
-      
         const vehicleHash = await vehicleContract.addVehicle(_name, _number, _address, _model, _soldDate);
         setIsLoading(true)
         console.log(`Loading - ${vehicleHash.hash}`);
         await vehicleHash.wait();
         setIsLoading(false)
         console.log(`Success - ${vehicleHash.hash}`);
-        alert("Vehicle Successfully Added.: " + vehicleHash.hash);
+        swal("Vehicle Added", "Vehicle Successfully Added."+vehicleHash.hash, "success");
       
     }
 
@@ -68,6 +81,9 @@ function App() {
   }
 
   
+  useEffect(()=>{
+    checkIfWalletIsConnected();
+  },[])
   return (
     <div className="mh-100 m-auto">
      
@@ -101,7 +117,7 @@ function App() {
             <th>Buyer Name</th>
             <th>Phone</th>
             <th>Address</th>
-            <th>Model</th>
+            <th>Vehicle Model</th>
             <th>Sold Date</th>
         </tr>
         </thead>
@@ -123,12 +139,9 @@ function App() {
       <div className='d-flex justify-content-center'>
       
       {
-        !metaMaskConnected ? <button className='btn btn-warning ' onClick={connectWallet}>Connect Wallet</button> : null
+        !currentAccount ? <button className='btn btn-warning ' onClick={connectWallet}>Connect Wallet</button> : null
       }
       </div>
-
-     
-      
     </div>
   );
 }
