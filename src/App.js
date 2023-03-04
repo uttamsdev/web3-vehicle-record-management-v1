@@ -7,90 +7,40 @@ const { ethereum } = window;
 
 
 function App() {
-  let event;
-  const [contractInfo, setContractInfo] = useState({
-    address: "-",
-    balance: []
-  });
   const [isLoading, setIsLoading] = useState(false);
 
   const [currentAccount, setCurrentAccount] = useState("");
 
-  // const [vehicles, setVehicles] = useState({ _name: '', _owner: '', _number: '', _license: ''});
   const [vehicles, setVehicles] = useState([]);
-  const [metaMaskConnected, setMetaMaskConnected] = useState(true);
+  const [metaMaskConnected, setMetaMaskConnected] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const data = new FormData(e.target);
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const erc20 = new ethers.Contract(data.get("address"), abi, provider);
 
-    const balance = await erc20.getBalance();
-
-    setContractInfo({
-      address: data.get("address"),
-      balance: balance
-    });
-    event = true;
-    console.log(contractInfo.balance);
-    console.log(event);
-  };
-
-  const checkIfWalletConnected = async () => {
-    // First Check if user has Metamask on his/her system
-    try {
-      if (!ethereum) return alert("Please install Metamusk!!!");
-
-      const accounts = await ethereum.request({ method: 'eth_accounts' });
-
-      if (accounts.length) {
-        setCurrentAccount(accounts[0]);
-        // setMetaMaskInstalled(true);
-        // return true;
-      } else {
-        console.log("No account available");
-        // setMetaMaskInstalled(false);
-        // return false;
-
-      }
-      console.log(accounts)
-
-    } catch (err) {
-      console.log(err);
-      throw new Error("No ethereum object available");
-    }
-  }
-  // const check = checkIfWalletConnected().then(result => console.log(result));
-  // console.log("check", check);
-  // Function to Connect the accounts
   const connectWallet = async () => {
     try {
-      if (!ethereum) return alert("Please install Metamusk!!!");
+      if (!ethereum) return alert("Please install Metamask!!!");
       const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
       setCurrentAccount(accounts[0]);
-      setMetaMaskConnected(false);
+      setMetaMaskConnected(true);
     } catch (err) {
       throw new Error("No ethereum object found");
     }
   }
 
-    // Add New Certificate
     const addVehicle = async (event) => {
       event.preventDefault();
         
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
-        // const {_name, _owner, _number, _license } = formData;
         let _name = event.target._name.value;
-        let _owner = event.target._owner.value;
-        let _number= event.target._number.value;
-        let _license = event.target._license.value;
-        console.log(_name, _owner, _number, _license);
+        let _number = event.target._number.value;
+        let _address= event.target._address.value;
+        let _model = event.target._model.value;
+        let _soldDate = event.target._soldDate.value;
+        console.log(_name, _number, _address, _model, _soldDate);
     
-        const vehicleContract = new ethers.Contract("0xbe17787a2e408736a557a5a83f73a5f9097be3d5", abi, signer);
+        const vehicleContract = new ethers.Contract("0xAAE09c65722c0DE64Ec6cF33c2399102477Ca387", abi, signer);
       
-        const vehicleHash = await vehicleContract.addVehicle(_name, _owner, _number, _license);
+        const vehicleHash = await vehicleContract.addVehicle(_name, _number, _address, _model, _soldDate);
         setIsLoading(true)
         console.log(`Loading - ${vehicleHash.hash}`);
         await vehicleHash.wait();
@@ -100,17 +50,15 @@ function App() {
       
     }
 
-      // Get all certificates
   const getAllVehicles = async (event) => {
     event.preventDefault();
     try {
-      if (!ethereum) return alert("Please install Metamusk!!!");
+      if (!ethereum) return alert("Please install MetaMask!!!");
       const provider = new ethers.providers.Web3Provider(ethereum);
       const signer = provider.getSigner();
-      const vehiclesContract = new ethers.Contract("0xbe17787a2e408736a557a5a83f73a5f9097be3d5", abi, signer);
+      const vehiclesContract = new ethers.Contract("0xAAE09c65722c0DE64Ec6cF33c2399102477Ca387", abi, signer);
 
       const vehicles = await vehiclesContract.getVehicles();
-      // setAllCertificates(certificates);
       setVehicles(vehicles)
       console.log(vehicles);
     } catch (err) {
@@ -121,48 +69,53 @@ function App() {
 
   
   return (
-    <div className="w-25 m-auto">
+    <div className="mh-100 m-auto">
      
 
-      <h1 className='text-primary text-center m-3 fw-bold'>Vehicle Management</h1>
-      <form onSubmit={addVehicle}>
-        <input className='form-control' type="text" name='_name' placeholder="Enter name"/> <br/>
-        <input className='form-control' type="text" name='_owner' placeholder="Enter Owner"/> <br/>
-        <input className='form-control' type="text" name='_number' placeholder="Enter Number"/> <br/>
-        <input className='form-control' type="text" name='_license' placeholder="Enter License"/> <br/>
+      <h1 className='text-primary text-center mb-4  fw-bold  bg-body-secondary p-2 shadow-sm rounded-bottom-pill'>Vehicle Record Management System</h1>
+      <form onSubmit={addVehicle} className="w-25 mx-auto">
+        <input className='form-control' type="text" name='_name' placeholder="Enter Vehicle Buyer Name"/> <br/>
+        <input className='form-control' type="text" name='_number' placeholder="Enter Buyer Number"/> <br/>
+        <input className='form-control' type="text" name='_address' placeholder="Enter Buyer Address"/> <br/>
+        <input className='form-control' type="text" name='_model' placeholder="Enter Vehicle Model"/> <br/>
+        <input className='form-control' type="date" name='_soldDate' placeholder="Enter Sold date"/> <br/>
         <button type='submit' className='btn btn-primary w-100'>Add Vehicle</button>
       </form>
 
+      {
+        isLoading ? <div className=' d-flex justify-content-center m-3'>
+        <div className="spinner-border" role="status" >
+          <span className="visually-hidden me-5">Loading...</span>
+        </div>
+        </div> : null
+      }
 
       <br/>
       <form onSubmit={getAllVehicles} className="d-flex justify-content-center mb-3">
-        {/* <input name="address" placeholder='Enter contract address'/> */}
         <button className='btn btn-danger' type='submit'>Get Contract Details</button>
       </form>
 
-      {/* <div>
-        {contractInfo.balance ? contractInfo?.balance?.map(number => <><h1>{number}</h1></>) : null}
-      </div> */}
-
-      <table className='table table-striped'>
+      <table className='table table-striped w-50 mx-auto bg-body-tertiary rounded text-center'>
         <thead>
         <tr scope="col">
-            <th>Name</th>
-            <th>Owner</th>
-            <th>Number</th>
-            <th>License</th>
+            <th>Buyer Name</th>
+            <th>Phone</th>
+            <th>Address</th>
+            <th>Model</th>
+            <th>Sold Date</th>
         </tr>
         </thead>
-       <tbody>
+       {<tbody>
        {
           vehicles?.map(vehicle => <tr>
-            <td>{vehicle.name}</td>
-            <td>{vehicle.owner}</td>
-            <td>{vehicle.number}</td>
-            <td>{vehicle.license}</td>
+            <td>{vehicle.ownerName}</td>
+            <td>{vehicle.ownerNumber}</td>
+            <td>{vehicle.OwnerAddress}</td>
+            <td>{vehicle.model}</td>
+            <td>{vehicle.soldDate}</td>
           </tr>)
         }
-       </tbody>
+       </tbody> }
       </table>
 
 
@@ -170,9 +123,11 @@ function App() {
       <div className='d-flex justify-content-center'>
       
       {
-        metaMaskConnected ? <button className='btn btn-warning ' onClick={connectWallet}>Connect Wallet</button> : null
+        !metaMaskConnected ? <button className='btn btn-warning ' onClick={connectWallet}>Connect Wallet</button> : null
       }
       </div>
+
+     
       
     </div>
   );

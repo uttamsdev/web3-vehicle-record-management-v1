@@ -3,22 +3,27 @@
 		"inputs": [
 			{
 				"internalType": "string",
-				"name": "_name",
+				"name": "_ownerName",
 				"type": "string"
 			},
 			{
 				"internalType": "string",
-				"name": "_owner",
+				"name": "_ownerNumber",
 				"type": "string"
 			},
 			{
 				"internalType": "string",
-				"name": "_number",
+				"name": "_ownerAddress",
 				"type": "string"
 			},
 			{
 				"internalType": "string",
-				"name": "_license",
+				"name": "_model",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_soldDate",
 				"type": "string"
 			}
 		],
@@ -28,37 +33,6 @@
 		"type": "function"
 	},
 	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"internalType": "string",
-				"name": "name",
-				"type": "string"
-			},
-			{
-				"indexed": false,
-				"internalType": "string",
-				"name": "owner",
-				"type": "string"
-			},
-			{
-				"indexed": false,
-				"internalType": "string",
-				"name": "number",
-				"type": "string"
-			},
-			{
-				"indexed": false,
-				"internalType": "string",
-				"name": "license",
-				"type": "string"
-			}
-		],
-		"name": "VehicleAdded",
-		"type": "event"
-	},
-	{
 		"inputs": [],
 		"name": "getVehicles",
 		"outputs": [
@@ -66,22 +40,27 @@
 				"components": [
 					{
 						"internalType": "string",
-						"name": "name",
+						"name": "ownerName",
 						"type": "string"
 					},
 					{
 						"internalType": "string",
-						"name": "owner",
+						"name": "ownerNumber",
 						"type": "string"
 					},
 					{
 						"internalType": "string",
-						"name": "number",
+						"name": "OwnerAddress",
 						"type": "string"
 					},
 					{
 						"internalType": "string",
-						"name": "license",
+						"name": "model",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "soldDate",
 						"type": "string"
 					}
 				],
